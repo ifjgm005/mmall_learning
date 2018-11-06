@@ -9,12 +9,13 @@
      http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
      http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
 
+        <!--<扫码 com.mmall 下的注解，方便类中的注入>-->
     <context:component-scan base-package="com.mmall" annotation-config="true"/>
 
     <!--<context:annotation-config/>-->
     <aop:aspectj-autoproxy/>
 
-
+     <!--<对配置文件进行一个分离，方便管理>-->
     <import resource="applicationContext-datasource.xml"/>
 
 

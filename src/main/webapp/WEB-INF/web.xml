@@ -46,8 +46,10 @@
   <!--load-on-startup 值大于等于 0 时 容器启动时初始化 servlet ,
   为空或者小于 0 时 当指定当前 servlet 时才启动-->
   <servlet>
+    <!--指定servlet 名称及配置文件等属性 -->
     <servlet-name>dispatcher</servlet-name>
     <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+    <!--指定  servlet 的配置文件-->
       <init-param>
           <param-name>contextConfigLocation</param-name>
           <param-value>WEB-INF/dispatcher-servlet.xml</param-value>
@@ -56,7 +58,7 @@
   </servlet>
 
 
-<!--dispatcher 的值， *.do 的请求进行拦截-->
+<!--上面指定了 servlet 名称及属性等 下面指定 拦截规则， *.do 的请求进行拦截,所以接口命名中都脚 xx.do-->
   <servlet-mapping>
     <servlet-name>dispatcher</servlet-name>
     <url-pattern>*.do</url-pattern>

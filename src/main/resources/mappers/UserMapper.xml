@@ -15,6 +15,7 @@
       <arg column="update_time" jdbcType="TIMESTAMP" javaType="java.util.Date" />
     </constructor>
   </resultMap>
+  <!--声明一个 Base_Column_List，方便下面引用-->
   <sql id="Base_Column_List" >
     id, username, password, email, phone, question, answer, role, create_time, update_time
   </sql>
@@ -35,8 +36,8 @@
       update_time)
     values (#{id,jdbcType=INTEGER}, #{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
       #{email,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, #{question,jdbcType=VARCHAR}, 
-      #{answer,jdbcType=VARCHAR}, #{role,jdbcType=INTEGER}, now(),
-      now())
+      #{answer,jdbcType=VARCHAR}, #{role,jdbcType=INTEGER},now(),
+     now())
   </insert>
   <insert id="insertSelective" parameterType="com.mmall.pojo.User" >
     insert into mmall_user
@@ -151,4 +152,39 @@
       update_time = now()
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+
+  <!--这里把上面实验的结果总结一下：
+
+count(*)和count(1)执行的效率是完全一样的。
+count(*)的执行效率比count(col)高，因此可以用count(*)的时候就不要去用count(col)。
+count(col)的执行效率比count(distinct col)高，不过这个结论的意义不大，这两种方法也是看需要去用。
+如果是对特定的列做count的话建立这个列的非聚集索引能对count有很大的帮助。
+如果经常count(*)的话则可以找一个最小的col建立非聚集索引以避免全表扫描而影响整体性能。
+在不加WHERE限制条件的情况下，COUNT(*)与COUNT(COL)基本可以认为是等价的；
+但是在有WHERE限制条件的情况下，COUNT(*)会比COUNT(COL)快非常多；
+count(0)=count(1)=count(*)
+1. count(指定的有效值):执行计划都会转化为count(*)
+
+2. 如果指定的是列名，会判断是否有null，null不计算
+
+当然，在建立优化count的索引之前一定要考虑新建立的索引会不会对别的查询有影响，影响有多大，要充分考虑之后再决定是否要这个索引，这是很重要的一点，不要捡了芝麻丢了西瓜。-->
+  <select id="checkUser" resultType="int" parameterType="string">
+    SELECT COUNT (1) FROM mmall_user  where username=#{userName}
+  </select>
+  
+  <select id="checkEmail" resultType="int" parameterType="String">
+    SELECT COUNT(1) FROM mmall_user where email=#{email}
+  </select>
+
+  <!--返回类型 resultMap，因为我们在最上面（第四行）申明了 -->
+  <!--parameterType 对应参数类型 "java.util.map"，这里缩写为 map,如果parameterMap 对应这里面申请的数据类型-->
+  <select id="selectLogin" resultMap="BaseResultMap" parameterType="map">
+    SELECT
+    <include refid="Base_Column_List" />
+    from mmall_user
+    WHERE username=#{userName_}
+    and password=#{passWord}
+  </select>
+
 </mapper>

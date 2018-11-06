@@ -25,7 +25,7 @@
     </bean>
 
 
-    <!---->
+    <!--指定数据库链接-->
     <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
         <property name="driverClassName" value="${db.driverClassName}"/>
         <property name="url" value="${db.url}"/>
