@@ -14,7 +14,7 @@ import javax.servlet.http.HttpSession;
 
 /**
  * @author axes create at 2018-05-04-18-37
- *用户 controller
+ * 用户 controller
  * RequestMapping 这里的作用是：
  * 我们要把我们的请求地址全部打到 /user/ 这个命名空间下，
  * 也就是说我们现在定义的接口全部在/user/下的，是个公共的，所以我们就把他写在类上面
@@ -37,34 +37,35 @@ public class UserController {
     IUserService iUserService;
 
     /**
-    * create by axes at 2018/5/7 下午5:18
-    * description: 用户登录接口
-    * @return ServiceResponse<User>
-    * @param username 用户名
-    * @param password 密码
-    * @param session HttpSession
-    */
-    @RequestMapping(value = "login.do",method = RequestMethod.POST)
+     * create by axes at 2018/5/7 下午5:18
+     * description: 用户登录接口
+     *
+     * @param username 用户名
+     * @param password 密码
+     * @param session  HttpSession
+     * @return ServiceResponse<User>
+     */
+    @RequestMapping(value = "login.do", method = RequestMethod.POST)
     @ResponseBody // 将返回值自动通过springmvc 的 Jackson 插件序列化为 json
-    public ServiceResponse<User> login(String username, String password, HttpSession session){
+    public ServiceResponse<User> login(String username, String password, HttpSession session) {
         //service -->mybatis -->dao
-        ServiceResponse<User> response=iUserService.login(username, password);
+        ServiceResponse<User> response = iUserService.login(username, password);
         if (response.isSuccess()) {
             //设置 session
-            session.setAttribute(Const.CURRENT_USER,response.getData());
+            session.setAttribute(Const.CURRENT_USER, response.getData());
         }
         return response;
     }
 
 
-
     /**
-    * create by axes at 2018/5/7 下午5:29
-    * description:退出登录接口
-    * @param session  HttpSession
-    */
+     * create by axes at 2018/5/7 下午5:29
+     * description:退出登录接口
+     *
+     * @param session HttpSession
+     */
 
-    @RequestMapping(value = "logout.do",method = RequestMethod.GET)
+    @RequestMapping(value = "logout.do", method = RequestMethod.GET)
     @ResponseBody // 将返回值自动通过springmvc 的 Jackson 插件序列化为 json
     public ServiceResponse<String> logout(HttpSession session) {
         if (session != null) {
@@ -77,51 +78,81 @@ public class UserController {
     }
 
 
-
     /**
-    * create by axes at 2018/5/7 下午5:30
-    * description: 注册接口
-    * @return ServiceResponse<String>
-    * @param user User
-    */
+     * create by axes at 2018/5/7 下午5:30
+     * description: 注册接口
+     *
+     * @param user User
+     * @return ServiceResponse<String>
+     */
 
-    @RequestMapping(value = "rigist.do",method = RequestMethod.POST)
+    @RequestMapping(value = "rigist.do", method = RequestMethod.POST)
     @ResponseBody // 将返回值自动通过springmvc 的 Jackson 插件序列化为 json
     public ServiceResponse<String> rigist(User user) {
         return iUserService.rigist(user);
     }
 
     /**
-    * create by axes at 2018/5/7 下午5:38
-    * description:
-    * @return 根据 type 类型，检测姓名或者邮箱是否已存在。
-    * @param value username 或者 email
-    * @param type 需要检测的类型
-    */
-    @RequestMapping(value = "checkValid.do",method = RequestMethod.POST)
+     * create by axes at 2018/5/7 下午5:38
+     * description:
+     *
+     * @param value username 或者 email
+     * @param type  需要检测的类型
+     * @return 根据 type 类型，检测姓名或者邮箱是否已存在。
+     */
+    @RequestMapping(value = "checkValid.do", method = RequestMethod.POST)
     @ResponseBody // 将返回值自动通过springmvc 的 Jackson 插件序列化为 json
     public ServiceResponse<String> checkValid(String value, String type) {
-       return iUserService.checkValid(value, type);
+        return iUserService.checkValid(value, type);
     }
-/**
-* create by axes at 2018/11/4 5:32 PM
-* description: 获取用户信息
-* @return User 或者错误消息
- * @param session
-*/
-    @RequestMapping(value = "getUserInfo.do",method = RequestMethod.GET)
-    @ResponseBody // 将返回值自动通过springmvc 的 Jackson 插件序列化为 json
-    public ServiceResponse<User> getUserInfo(HttpSession session){
 
-        if(session!=null){
+    /**
+     * create by axes at 2018/11/4 5:32 PM
+     * description: 获取用户信息
+     *
+     * @param session HttpSession
+     * @return User 或者错误消息
+     */
+    @RequestMapping(value = "get_user_info.do", method = RequestMethod.GET)
+    @ResponseBody // 将返回值自动通过springmvc 的 Jackson 插件序列化为 json
+    public ServiceResponse<User> getUserInfo(HttpSession session) {
+
+        if (session != null) {
             User user = (User) session.getAttribute(Const.CURRENT_USER);
             return ServiceResponse.createBySuccess(user);
         }
         return ServiceResponse.createByErrorMessage("用户未登录无法获取用户信息");
     }
 
+    /**
+     * create by axes at 2018/11/7 10:52 PM
+     * description: 获取密码回答问题
+     *
+     * @param username 客户姓名
+     * @return ServiceResponse<String> 包含密码回答问题或错误信息的 ServiceResponse<String>
+     */
 
 
+    @RequestMapping(value = "get_forget_question.do", method = RequestMethod.GET)
+    @ResponseBody // 将返回值自动通过springmvc 的 Jackson 插件序列化为 json
+    public ServiceResponse<String> getForgetQuestion(String username) {
+        return iUserService.getForgetQuestion(username);
+    }
+
+    
+    /**
+    * create by axes at 2018/11/7 10:55 PM
+    * description: 检查密码回答问题是否正确
+    * @return ServiceResponse<String> 密码回答问题的结果或错误信息的 ServiceResponse<String>
+    * @param userName 用户名
+    * @param question 密码回答问题
+    * @param answer 用户填写密码问题
+    */
+    @RequestMapping(value = "check_question.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServiceResponse<String> checkQuestion(String userName, String question,String answer) {
+        return iUserService.checkQuestion(userName, question,answer);
+    }
 
 
 

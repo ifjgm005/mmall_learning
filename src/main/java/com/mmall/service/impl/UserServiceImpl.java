@@ -2,6 +2,7 @@ package com.mmall.service.impl;
 
 import com.mmall.common.Const;
 import com.mmall.common.ServiceResponse;
+import com.mmall.common.TokenCache;
 import com.mmall.dao.UserMapper;
 import com.mmall.pojo.User;
 import com.mmall.service.IUserService;
@@ -9,6 +10,9 @@ import com.mmall.util.MD5Util;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.servlet.http.HttpSession;
+import java.util.UUID;
 
 /**
  * 用户 service 接口实现
@@ -95,7 +99,7 @@ public class UserServiceImpl implements IUserService {
     public ServiceResponse<String> rigist(User user) {
         ServiceResponse<String> repose_check_username = checkValid(user.getUsername(), Const.checkType.TYPE_USERNAME);
         ServiceResponse<String> repose_check_email = checkValid(user.getEmail(), Const.checkType.TYPE_EMAIL);
-       //返回校验姓名失败的 ServiceResponse<String>
+        //返回校验姓名失败的 ServiceResponse<String>
         if (!repose_check_username.isSuccess()) {
             return repose_check_username;
 
@@ -109,7 +113,7 @@ public class UserServiceImpl implements IUserService {
         user.setPassword(mdPassword);
 
 //        如果用户角色未指定默认为普通用户
-        if (user.getRole()==null) {
+        if (user.getRole() == null) {
             user.setRole(Const.Role.ROLE_COMMON);
         }
         int count = userMapper.insert(user);
@@ -118,4 +122,54 @@ public class UserServiceImpl implements IUserService {
         }
         return ServiceResponse.createBySuccessMessage("注册成功");
     }
+
+    /**
+     * create by axes at 2018/11/7 9:53 PM
+     * description: 获取忘记密码的回答问题
+     *
+     * @param username 客户姓名
+     * @return ServiceResponse<String>
+     */
+    @Override
+    public ServiceResponse<String> getForgetQuestion(String username) {
+        //检查用户是否存在
+        ServiceResponse<String> serviceResponse = checkValid(username, Const.checkType.TYPE_USERNAME);
+        if (serviceResponse.isSuccess()) {
+            return ServiceResponse.createBySuccessMessage("用户不存在");
+        }
+
+        // userMapper dao 层查找密码找回问题
+        String question = userMapper.getForgetQuestion(username);
+        if (StringUtils.isBlank(question)) {
+            return ServiceResponse.createByErrorMessage("用户未设置密码找回问题");
+        }
+        return ServiceResponse.createBySuccess(question);
+    }
+
+
+    /**
+     * create by axes at 2018/11/7 10:30 PM
+     * description: 检查密码找回问题是否正确
+     *
+     * @param answer 客户填写的密码找回问题答案
+     * @return ServiceResponse<String> 密码找回问题是否正确
+     */
+    @Override
+    public ServiceResponse<String> checkQuestion(String username,String question,String answer) {
+        if(StringUtils.isBlank(answer)){
+            return ServiceResponse.createByErrorMessage("密码回答问题不能为空");
+        }
+        int count=userMapper.selectAnswer(username,question,answer);
+        if(count>0){
+            //回答正确
+            String forgetToken = UUID.randomUUID().toString();
+            TokenCache.setValue(Const.TOKENPREFIX+username,forgetToken);
+
+            //把token返回给前端
+            return ServiceResponse.createBySuccessMessage(forgetToken);
+        }
+        return ServiceResponse.createByErrorMessage("密码回答问题错误！");
+    }
+
+
 }

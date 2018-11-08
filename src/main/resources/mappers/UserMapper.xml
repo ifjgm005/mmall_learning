@@ -187,4 +187,17 @@ count(0)=count(1)=count(*)
     and password=#{passWord}
   </select>
 
+  <select id="getForgetQuestion" resultType="String" parameterType="String">
+    SELECT  question
+    from mmall_user
+    where username=#{username}
+  </select>
+  <select id="selectAnswer" resultType="integer" parameterType="map">
+    SELECT answer
+    from mmall_user
+    WHERE username=#{username}
+    AND answer=#{answer}
+    AND question=#{question}
+  </select>
+
 </mapper>

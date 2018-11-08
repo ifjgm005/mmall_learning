@@ -7,6 +7,7 @@ package com.mmall.common;
  */
 public class Const {
     public static final String CURRENT_USER = "current_user";
+    public static final String TOKENPREFIX = "token_prefix";
 
     //用枚举太重了，刚好可以用这种方式分组
     public interface checkType {

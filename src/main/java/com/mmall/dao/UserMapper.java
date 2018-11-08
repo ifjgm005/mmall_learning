@@ -22,4 +22,8 @@ public interface UserMapper {
 
     //检查email
     int checkEmail(String email);
+
+    String getForgetQuestion(String username);
+
+    int selectAnswer(@Param("username") String username,@Param("question") String question,@Param("answer") String answer);
 }
