@@ -192,12 +192,32 @@ count(0)=count(1)=count(*)
     from mmall_user
     where username=#{username}
   </select>
+
+
   <select id="selectAnswer" resultType="integer" parameterType="map">
     SELECT answer
     from mmall_user
     WHERE username=#{username}
     AND answer=#{answer}
     AND question=#{question}
+  </select>
+
+
+
+<update id="resetPassword" parameterType="map">
+        UPDATE mmall_user set password=#{passwordNew},
+        set update_time=now()
+        where username=#{userName}
+</update>
+
+
+
+
+  <select id="checkPassword" parameterType="map" resultType="int">
+    SELECT COUNT (1)
+    from mmall_user
+    where username=#{username}
+    and password=#{oldpassword}
   </select>
 
 </mapper>

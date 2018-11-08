@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class TokenCache {
     private static final Logger logger = LoggerFactory.getLogger(TokenCache.class);
-
+    private static final String TOKENPREFIX = "token_prefix";
     // initialCapacity 初始化缓存容量
     // maximumSize 缓存的最大容量， 达到最大容量后采用 LRU 算法
     // expireAfterAccess 缓存周期
@@ -43,7 +43,7 @@ public class TokenCache {
      * @param key   键值
      * @param value 值
      */
-    public static void setValue(String key, String value) {
+    public static void setTokenCache(String key, String value) {
         localCache.put(key, value);
     }
 
@@ -54,7 +54,7 @@ public class TokenCache {
      * @param key key 值
      * @return String 返回和key 对应的String 类型的值
      */
-    public static String getValue(String key) {
+    public static String getCacheToken(String key) {
         String value = null;
         try {
             value = localCache.get(key);
@@ -67,5 +67,15 @@ public class TokenCache {
             logger.error("localcache get error", e);
         }
         return value;
+    }
+
+    /**
+    * create by axes at 2018/11/8 10:37 PM
+    * description: 用固定前缀和客户姓名拼接 key 用户缓存 token
+    * @return 返回拼接后的token 缓存的key
+    * @param userName 客户姓名
+    */
+    public static String joinTokenWithUser(String userName) {
+        return TOKENPREFIX+userName;
     }
 }

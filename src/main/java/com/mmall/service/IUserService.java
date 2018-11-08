@@ -19,5 +19,10 @@ public interface IUserService {
     ServiceResponse<String> getForgetQuestion(String username);
 
     ServiceResponse<String> checkQuestion(String username,String question,String answer);
+
+    ServiceResponse<String> resetUserPassword(String userName, String passwordNew, String token);
+
+    ServiceResponse<String> resetPassword(String oldPassword,String passwordNew,User user)
+
 }
 

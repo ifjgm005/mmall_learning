@@ -153,6 +153,38 @@ public class UserController {
     public ServiceResponse<String> checkQuestion(String userName, String question,String answer) {
         return iUserService.checkQuestion(userName, question,answer);
     }
+    
+    
+    /**
+    * create by axes at 2018/11/8 11:42 PM
+    * description: 重置密码
+    * @return 重置密码的结果
+    * @param userName 用户名
+    * @param passwordNew 新的password
+    * @param token 用户端传过来的token
+    */
+    @RequestMapping(value = "forget_reset_password.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServiceResponse<String> forgetResetPassword(String userName,String passwordNew,String token){
+        return iUserService.resetUserPassword(userName,passwordNew,token);
+
+    }
+
+    @RequestMapping(value = "reset_password.do", method = RequestMethod.GET)
+    @ResponseBody
+    public  ServiceResponse<String> resetPassword(HttpSession session,String oldPassword,String passwordNew){
+        User user = (User) session.getAttribute(Const.CURRENT_USER);
+
+        //检查用户是否登录
+        if(user==null){
+            return ServiceResponse.createByErrorMessage("用户未登录，无法重置");
+        }
+
+        return iUserService.resetPassword(oldPassword,passwordNew,user);
+    }
+
+
+
 
 
 

@@ -11,7 +11,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpSession;
 import java.util.UUID;
 
 /**
@@ -40,7 +39,7 @@ public class UserServiceImpl implements IUserService {
         if (resultCount == 0) {
             return ServiceResponse.createByErrorMessage("用户不存在");
         }
-        //todo selectLogin
+
         String md5Password = MD5Util.MD5EncodeUtf8(password);
         User user = userMapper.selectLogin(username, md5Password);
         if (user == null) {
@@ -155,21 +154,94 @@ public class UserServiceImpl implements IUserService {
      * @return ServiceResponse<String> 密码找回问题是否正确
      */
     @Override
-    public ServiceResponse<String> checkQuestion(String username,String question,String answer) {
-        if(StringUtils.isBlank(answer)){
+    public ServiceResponse<String> checkQuestion(String username, String question, String answer) {
+        if (StringUtils.isBlank(answer)) {
             return ServiceResponse.createByErrorMessage("密码回答问题不能为空");
         }
-        int count=userMapper.selectAnswer(username,question,answer);
-        if(count>0){
+        int count = userMapper.selectAnswer(username, question, answer);
+        if (count > 0) {
             //回答正确
             String forgetToken = UUID.randomUUID().toString();
-            TokenCache.setValue(Const.TOKENPREFIX+username,forgetToken);
+            TokenCache.setTokenCache(TokenCache.joinTokenWithUser(username), forgetToken);
 
             //把token返回给前端
             return ServiceResponse.createBySuccessMessage(forgetToken);
         }
         return ServiceResponse.createByErrorMessage("密码回答问题错误！");
     }
+
+    /**
+     * create by axes at 2018/11/8 10:15 PM
+     * description: 忘记密码时重置密码
+     *
+     * @param userName    用户名
+     * @param passwordNew 新密码
+     * @param token       找回密码问题接口返回的token
+     * @return ServiceResponse<String> 类型的重置用户密码结果
+     */
+    public ServiceResponse<String> resetUserPassword(String userName, String passwordNew, String token) {
+        //token 不能为空
+        if (StringUtils.isBlank(token)) {
+            return ServiceResponse.createByErrorMessage("token 不能为空");
+        }
+
+        //判断用户是否存在
+        ServiceResponse<String> checkValid = checkValid(userName, Const.checkType.TYPE_USERNAME);
+        if (checkValid.isSuccess()) {
+            return ServiceResponse.createByErrorMessage("用户名错误");
+        }
+
+        //缓存token 是否有效
+        String cacheToken = TokenCache.getCacheToken(TokenCache.joinTokenWithUser(userName));
+        if (StringUtils.isBlank(cacheToken)) {
+            return ServiceResponse.createByErrorMessage("token过期或失效");
+        }
+
+        //比较缓存的token 和 客户端传过来的token 是否一致
+        if (StringUtils.equals(cacheToken, token)) {
+            String md5Password = MD5Util.MD5EncodeUtf8(passwordNew);
+            int count = userMapper.resetPassword(userName, md5Password);
+
+            //正确重置密码
+            if (count > 0) {
+                return ServiceResponse.createBySuccessMessage("密码重置成功");
+            }
+
+            //重置密码失败
+            return ServiceResponse.createByErrorMessage("重置密码失败");
+        }
+
+        //客户端token 和缓存token不一致
+        return ServiceResponse.createByErrorMessage("Token 错误，请重新获取填写密码提示问题");
+
+    }
+
+
+    /**
+    * create by axes at 2018/11/8 11:57 PM
+    * description: 重置密码（用户登录的情况下）
+    * @return ServiceResponse<String> 重置密码的结果
+    * @param  user 用户
+    */
+    public  ServiceResponse<String> resetPassword(String oldPassword,String passwordNew,User user){
+        //加密
+        String md5OldPassword = MD5Util.MD5EncodeUtf8(oldPassword);
+        String md5PasswordNew = MD5Util.MD5EncodeUtf8(passwordNew);
+
+        //防止横向越权，要检验下用户旧密码是否为为该用户的旧密码
+        int rowCount = userMapper.checkPassword(user.getUsername(), md5OldPassword);
+        if(rowCount<1){
+            return ServiceResponse.createByErrorMessage("旧密码错误");
+        }
+        //更新为新密码
+        user.setPassword(md5PasswordNew);
+        int count=userMapper.updateByPrimaryKeySelective(user);
+        if(count>0){
+            return ServiceResponse.createBySuccessMessage("重置密码成功");
+        }
+        return ServiceResponse.createByErrorMessage("重置密码失败");
+    }
+
 
 
 }

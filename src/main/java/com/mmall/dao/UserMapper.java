@@ -26,4 +26,10 @@ public interface UserMapper {
     String getForgetQuestion(String username);
 
     int selectAnswer(@Param("username") String username,@Param("question") String question,@Param("answer") String answer);
+
+
+    int resetPassword(@Param("userName") String userName, @Param("passwordNew") String passwordNew);
+
+
+    int checkPassword(@Param("username") String username, @Param("oldpassword") String oldpassword);
 }
