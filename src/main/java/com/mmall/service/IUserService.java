@@ -22,7 +22,7 @@ public interface IUserService {
 
     ServiceResponse<String> resetUserPassword(String userName, String passwordNew, String token);
 
-    ServiceResponse<String> resetPassword(String oldPassword,String passwordNew,User user)
+    ServiceResponse<String> resetPassword(String oldPassword,String passwordNew,User user);
 
 }
 

@@ -170,7 +170,7 @@ count(0)=count(1)=count(*)
 
 当然，在建立优化count的索引之前一定要考虑新建立的索引会不会对别的查询有影响，影响有多大，要充分考虑之后再决定是否要这个索引，这是很重要的一点，不要捡了芝麻丢了西瓜。-->
   <select id="checkUser" resultType="int" parameterType="string">
-    SELECT COUNT (1) FROM mmall_user  where username=#{userName}
+    SELECT COUNT(1) FROM mmall_user  where username=#{userName}
   </select>
   
   <select id="checkEmail" resultType="int" parameterType="String">
@@ -195,7 +195,7 @@ count(0)=count(1)=count(*)
 
 
   <select id="selectAnswer" resultType="integer" parameterType="map">
-    SELECT answer
+    SELECT count(1)
     from mmall_user
     WHERE username=#{username}
     AND answer=#{answer}
@@ -214,7 +214,7 @@ count(0)=count(1)=count(*)
 
 
   <select id="checkPassword" parameterType="map" resultType="int">
-    SELECT COUNT (1)
+    SELECT COUNT(1)
     from mmall_user
     where username=#{username}
     and password=#{oldpassword}

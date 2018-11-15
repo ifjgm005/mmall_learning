@@ -65,7 +65,7 @@ public class UserController {
      * @param session HttpSession
      */
 
-    @RequestMapping(value = "logout.do", method = RequestMethod.GET)
+    @RequestMapping(value = "logout.do", method = RequestMethod.POST)
     @ResponseBody // 将返回值自动通过springmvc 的 Jackson 插件序列化为 json
     public ServiceResponse<String> logout(HttpSession session) {
         if (session != null) {
@@ -113,7 +113,7 @@ public class UserController {
      * @param session HttpSession
      * @return User 或者错误消息
      */
-    @RequestMapping(value = "get_user_info.do", method = RequestMethod.GET)
+    @RequestMapping(value = "get_user_info.do", method = RequestMethod.POST)
     @ResponseBody // 将返回值自动通过springmvc 的 Jackson 插件序列化为 json
     public ServiceResponse<User> getUserInfo(HttpSession session) {
 
@@ -133,7 +133,7 @@ public class UserController {
      */
 
 
-    @RequestMapping(value = "get_forget_question.do", method = RequestMethod.GET)
+    @RequestMapping(value = "get_forget_question.do", method = RequestMethod.POST)
     @ResponseBody // 将返回值自动通过springmvc 的 Jackson 插件序列化为 json
     public ServiceResponse<String> getForgetQuestion(String username) {
         return iUserService.getForgetQuestion(username);
@@ -148,7 +148,7 @@ public class UserController {
     * @param question 密码回答问题
     * @param answer 用户填写密码问题
     */
-    @RequestMapping(value = "check_question.do", method = RequestMethod.GET)
+    @RequestMapping(value = "check_question.do", method = RequestMethod.POST)
     @ResponseBody
     public ServiceResponse<String> checkQuestion(String userName, String question,String answer) {
         return iUserService.checkQuestion(userName, question,answer);
@@ -163,14 +163,14 @@ public class UserController {
     * @param passwordNew 新的password
     * @param token 用户端传过来的token
     */
-    @RequestMapping(value = "forget_reset_password.do", method = RequestMethod.GET)
+    @RequestMapping(value = "forget_reset_password.do", method = RequestMethod.POST)
     @ResponseBody
     public ServiceResponse<String> forgetResetPassword(String userName,String passwordNew,String token){
         return iUserService.resetUserPassword(userName,passwordNew,token);
 
     }
 
-    @RequestMapping(value = "reset_password.do", method = RequestMethod.GET)
+    @RequestMapping(value = "reset_password.do", method = RequestMethod.POST)
     @ResponseBody
     public  ServiceResponse<String> resetPassword(HttpSession session,String oldPassword,String passwordNew){
         User user = (User) session.getAttribute(Const.CURRENT_USER);
