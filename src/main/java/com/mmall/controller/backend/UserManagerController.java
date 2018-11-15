@@ -17,11 +17,12 @@ import javax.servlet.http.HttpSession;
  * create at:  2018/11/12  3:03 PM
  * @description: 后台用户 controller
  */
+
 @Controller
-@RequestMapping("/manager/user")
+@RequestMapping("/back/user")
 public class UserManagerController {
     @Autowired
-    private IUserService iUserService;
+    IUserService iUserService;
 
     /**
      * create by axes at 2018/11/12 3:27 PM
@@ -29,12 +30,12 @@ public class UserManagerController {
      *
      * @param userName 用户名
      * @param password 密码
-     * @param session HttpSession
-     * @return
+     * @param session  HttpSession
+     * @return ServiceResponse<User>
      */
-    @RequestMapping(value = "login.do" ,method = RequestMethod.POST)
+    @RequestMapping(value = "manager_login.do" ,method = RequestMethod.POST)
     @ResponseBody
-    public ServiceResponse login(String userName, String password, HttpSession session) {
+    public ServiceResponse<User> managerLogin(String userName, String password, HttpSession session) {
         ServiceResponse<User> userServiceResponse = iUserService.login(userName, password);
         if (userServiceResponse.isSuccess()) {
             if (userServiceResponse.getData().getRole() != Const.Role.ROLE_ADMIN) {
