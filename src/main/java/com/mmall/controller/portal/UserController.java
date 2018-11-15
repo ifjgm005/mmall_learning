@@ -1,6 +1,7 @@
 package com.mmall.controller.portal;
 
 import com.mmall.common.Const;
+import com.mmall.common.ResponseCode;
 import com.mmall.common.ServiceResponse;
 import com.mmall.pojo.User;
 import com.mmall.service.IUserService;
@@ -21,7 +22,8 @@ import javax.servlet.http.HttpSession;
  * 如果我们写在方法上，那么每个方法都要写这个 /user/ ，所以为了美观和方便，自然选用这种方式
  */
 @Controller
-@RequestMapping("/user/")
+@RequestMapping("/user")
+//@RequestMapping("/user/")效果相同
 public class UserController {
     /**
      * 用户登录
@@ -139,8 +141,9 @@ public class UserController {
         return iUserService.getForgetQuestion(username);
     }
 
-    
+
     /**
+<<<<<<< HEAD
     * create by axes at 2018/11/7 10:55 PM
     * description: 检查密码回答问题是否正确
     * @return ServiceResponse<String> 密码回答问题的结果或错误信息的 ServiceResponse<String>
@@ -148,14 +151,17 @@ public class UserController {
     * @param question 密码回答问题
     * @param answer 用户填写密码问题
     */
+
+
     @RequestMapping(value = "check_question.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServiceResponse<String> checkQuestion(String userName, String question,String answer) {
-        return iUserService.checkQuestion(userName, question,answer);
+    public ServiceResponse<String> checkQuestion(String userName, String question, String answer) {
+        return iUserService.checkQuestion(userName, question, answer);
     }
-    
-    
+
+
     /**
+<<<<<<< HEAD
     * create by axes at 2018/11/8 11:42 PM
     * description: 重置密码
     * @return 重置密码的结果
@@ -163,26 +169,73 @@ public class UserController {
     * @param passwordNew 新的password
     * @param token 用户端传过来的token
     */
+
+
     @RequestMapping(value = "forget_reset_password.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServiceResponse<String> forgetResetPassword(String userName,String passwordNew,String token){
-        return iUserService.resetUserPassword(userName,passwordNew,token);
+    public ServiceResponse<String> forgetResetPassword(String userName, String passwordNew, String token) {
+        return iUserService.resetUserPassword(userName, passwordNew, token);
 
     }
 
     @RequestMapping(value = "reset_password.do", method = RequestMethod.POST)
     @ResponseBody
-    public  ServiceResponse<String> resetPassword(HttpSession session,String oldPassword,String passwordNew){
+    public ServiceResponse<String> resetPassword(HttpSession session, String oldPassword, String passwordNew) {
         User user = (User) session.getAttribute(Const.CURRENT_USER);
 
         //检查用户是否登录
-        if(user==null){
+        if (user == null) {
             return ServiceResponse.createByErrorMessage("用户未登录，无法重置");
         }
 
-        return iUserService.resetPassword(oldPassword,passwordNew,user);
+        return iUserService.resetPassword(oldPassword, passwordNew, user);
     }
 
+
+    /**
+     * create by axes at 2018/11/9 11:57 PM
+     * description: 更新用户信息（登录状态下）
+     *
+     * @param session
+     * @param user    用户  User
+     * @param
+     * @return ServiceResponse<User> 更新后user 及更新结果
+     */
+    @RequestMapping(value = "update_user_info.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServiceResponse<User> updateUserInfo(HttpSession session, User user) {
+        User currentUser = (User) session.getAttribute(Const.CURRENT_USER);
+        //检查用户是否登录
+        if (currentUser == null) {
+            return ServiceResponse.createByErrorMessage("用户未登录，无法重置");
+        }
+        //这两个字段是不能更新的,为防止更新时数据越权，从session 中获取这些信息。
+        user.setId(currentUser.getId());
+        user.setUsername(currentUser.getUsername());
+        return iUserService.updateUserInfo(user);
+    }
+
+
+    /**
+     * create by axes at 2018/11/12 2:39 PM
+     * description:
+     *
+     * @param session HttpSession
+     * @return ServiceResponse<User> 用户信息或者错误信息
+     */
+
+    @RequestMapping(value = "get_information.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServiceResponse<User> getInformation(HttpSession session) {
+
+        User currentUser = (User) session.getAttribute(Const.CURRENT_USER);
+        //检查用户是否登录
+        if (currentUser == null) {
+            return ServiceResponse.createByErrorMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录，需要强制登录status=10");
+        }
+        return iUserService.getUseInfo(currentUser.getId());
+
+    }
 
 
 
