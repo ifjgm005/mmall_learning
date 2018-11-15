@@ -242,6 +242,46 @@ public class UserServiceImpl implements IUserService {
         return ServiceResponse.createByErrorMessage("重置密码失败");
     }
 
+    /**
+    * create by axes at 2018/11/10 12:10 AM
+    * description: 更新用户信息。若更新成功返回更新后的User
+    * @return 更新后的结果
+    * @param user 用户名
+    */
+    public ServiceResponse<User> updateUserInfo(User user){
 
+        //判断email 是否被别人占用了。
+        int count=userMapper.checkEmailByUserId(user.getId(), user.getEmail());
+        if(count>0){
+            return ServiceResponse.createByErrorMessage("email 被占用");
+        }
+
+        //封装更新的User，因为只需要更新部分信息，不用更新全部字段。
+        User updateUser = new User();
+        updateUser.setId(user.getId());
+        updateUser.setEmail(user.getEmail());
+        updateUser.setQuestion(user.getQuestion());
+        updateUser.setAnswer(user.getAnswer());
+        updateUser.setPhone(user.getPhone());
+        int updateCount = userMapper.updateByPrimaryKeySelective(updateUser);
+        if (updateCount>0){
+            return ServiceResponse.createBySuccess("更新成功", user);
+        }
+        return ServiceResponse.createByErrorMessage("更新失败");
+
+    }
+
+
+
+  public ServiceResponse<User>  getUseInfo(Integer userId){
+      User user=userMapper.selectByPrimaryKey(userId);
+      if(user==null){
+          return ServiceResponse.createByErrorMessage("用户不存在");
+      }
+      user.setPassword(StringUtils.EMPTY);
+      return ServiceResponse.createBySuccess(user);
+  }
 
 }
+
+
