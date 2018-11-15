@@ -15,7 +15,7 @@ import java.io.InputStreamReader;
 /**
  * @author : Axes
  * create at:  2018/11/14  3:49 PM
- * @description: 用来测试的接口
+ * description: 用来测试的接口,但是只完成了部分接口。需要添加新的接口时才会来维护这个分支
  */
 @Controller
 @RequestMapping("/api/test")
