@@ -229,7 +229,7 @@ count(0)=count(1)=count(*)
     SELECT COUNT(1)
     FROM mmall_user
     WHERE  email=#{email}
-    and id=!#{id}
+    and id!=#{id}
   </select>
 
 </mapper>

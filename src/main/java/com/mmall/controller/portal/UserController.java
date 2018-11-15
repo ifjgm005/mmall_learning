@@ -25,18 +25,16 @@ import javax.servlet.http.HttpSession;
 @RequestMapping("/user")
 //@RequestMapping("/user/")效果相同
 public class UserController {
-    /**
-     * 用户登录
-     * create by axes at 下午10:14 2018/5/4
-     *
-     * @return Object
-     * @param userName 用户姓名
-     */
 
     //注入 IUserService 。在IUserService 的@service 注解里名字为 iUserService，所以这里
     // 也应该为 iUserService
     @Autowired
     IUserService iUserService;
+
+
+
+
+
 
     /**
      * create by axes at 2018/5/7 下午5:18
@@ -60,24 +58,34 @@ public class UserController {
     }
 
 
+
+
+
+
+
+
+
+
     /**
      * create by axes at 2018/5/7 下午5:29
      * description:退出登录接口
      *
      * @param session HttpSession
      */
-
     @RequestMapping(value = "logout.do", method = RequestMethod.POST)
     @ResponseBody // 将返回值自动通过springmvc 的 Jackson 插件序列化为 json
     public ServiceResponse<String> logout(HttpSession session) {
-        if (session != null) {
-            session.removeAttribute(Const.CURRENT_USER);
-            return ServiceResponse.createBySuccessMessage("登出成功");
-
-        } else {
-            return ServiceResponse.createByErrorMessage("session 不能为空");
-        }
+        session.removeAttribute(Const.CURRENT_USER);
+        return ServiceResponse.createBySuccessMessage("登出成功");
     }
+
+
+
+
+
+
+
+
 
 
     /**
@@ -87,12 +95,19 @@ public class UserController {
      * @param user User
      * @return ServiceResponse<String>
      */
-
     @RequestMapping(value = "rigist.do", method = RequestMethod.POST)
     @ResponseBody // 将返回值自动通过springmvc 的 Jackson 插件序列化为 json
     public ServiceResponse<String> rigist(User user) {
         return iUserService.rigist(user);
     }
+
+
+
+
+
+
+
+
 
     /**
      * create by axes at 2018/5/7 下午5:38
@@ -108,6 +123,13 @@ public class UserController {
         return iUserService.checkValid(value, type);
     }
 
+
+
+
+
+
+
+
     /**
      * create by axes at 2018/11/4 5:32 PM
      * description: 获取用户信息
@@ -119,12 +141,19 @@ public class UserController {
     @ResponseBody // 将返回值自动通过springmvc 的 Jackson 插件序列化为 json
     public ServiceResponse<User> getUserInfo(HttpSession session) {
 
-        if (session != null) {
-            User user = (User) session.getAttribute(Const.CURRENT_USER);
+        User user = (User) session.getAttribute(Const.CURRENT_USER);
+        if (user != null) {
             return ServiceResponse.createBySuccess(user);
         }
         return ServiceResponse.createByErrorMessage("用户未登录无法获取用户信息");
     }
+
+
+
+
+
+
+
 
     /**
      * create by axes at 2018/11/7 10:52 PM
@@ -133,8 +162,6 @@ public class UserController {
      * @param username 客户姓名
      * @return ServiceResponse<String> 包含密码回答问题或错误信息的 ServiceResponse<String>
      */
-
-
     @RequestMapping(value = "get_forget_question.do", method = RequestMethod.POST)
     @ResponseBody // 将返回值自动通过springmvc 的 Jackson 插件序列化为 json
     public ServiceResponse<String> getForgetQuestion(String username) {
@@ -142,17 +169,22 @@ public class UserController {
     }
 
 
+
+
+
+
+
+
+
     /**
-<<<<<<< HEAD
-    * create by axes at 2018/11/7 10:55 PM
-    * description: 检查密码回答问题是否正确
-    * @return ServiceResponse<String> 密码回答问题的结果或错误信息的 ServiceResponse<String>
-    * @param userName 用户名
-    * @param question 密码回答问题
-    * @param answer 用户填写密码问题
-    */
-
-
+     * create by axes at 2018/11/7 10:55 PM
+     * description: 检查密码回答问题是否正确
+     *
+     * @param userName 用户名
+     * @param question 密码回答问题
+     * @param answer   用户填写密码问题
+     * @return ServiceResponse<String> 密码回答问题的结果或错误信息的 ServiceResponse<String>
+     */
     @RequestMapping(value = "check_question.do", method = RequestMethod.POST)
     @ResponseBody
     public ServiceResponse<String> checkQuestion(String userName, String question, String answer) {
@@ -160,17 +192,22 @@ public class UserController {
     }
 
 
+
+
+
+
+
+
+
     /**
-<<<<<<< HEAD
-    * create by axes at 2018/11/8 11:42 PM
-    * description: 重置密码
-    * @return 重置密码的结果
-    * @param userName 用户名
-    * @param passwordNew 新的password
-    * @param token 用户端传过来的token
-    */
-
-
+     * create by axes at 2018/11/8 11:42 PM
+     * description: 重置密码
+     *
+     * @param userName    用户名
+     * @param passwordNew 新的password
+     * @param token       用户端传过来的token
+     * @return 重置密码的结果
+     */
     @RequestMapping(value = "forget_reset_password.do", method = RequestMethod.POST)
     @ResponseBody
     public ServiceResponse<String> forgetResetPassword(String userName, String passwordNew, String token) {
@@ -192,6 +229,13 @@ public class UserController {
     }
 
 
+
+
+
+
+
+
+
     /**
      * create by axes at 2018/11/9 11:57 PM
      * description: 更新用户信息（登录状态下）
@@ -203,17 +247,23 @@ public class UserController {
      */
     @RequestMapping(value = "update_user_info.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServiceResponse<User> updateUserInfo(HttpSession session, User user) {
+    public ServiceResponse<User> updateUserInfo( User user,HttpSession session) {
         User currentUser = (User) session.getAttribute(Const.CURRENT_USER);
         //检查用户是否登录
         if (currentUser == null) {
-            return ServiceResponse.createByErrorMessage("用户未登录，无法重置");
+            return ServiceResponse.createByErrorMessage("用户未登录，无法更新");
         }
         //这两个字段是不能更新的,为防止更新时数据越权，从session 中获取这些信息。
         user.setId(currentUser.getId());
         user.setUsername(currentUser.getUsername());
         return iUserService.updateUserInfo(user);
     }
+
+
+
+
+
+
 
 
     /**
@@ -236,6 +286,8 @@ public class UserController {
         return iUserService.getUseInfo(currentUser.getId());
 
     }
+
+
 
 
 
